@@ -40,8 +40,6 @@ export function useJudgeMeReviews(
   const [error, setError] = useState<Error | null>(null);
   const [hasNextPage, setHasNextPage] = useState(false);
 
-  /** The Judge.me product id, resolved once per handle and reused by `loadMore`. */
-  const productId = useRef<number | null>(null);
   const page = useRef(1);
   /** Guards against an out-of-order resolve landing under a newer load. */
   const reqId = useRef(0);
@@ -52,28 +50,16 @@ export function useJudgeMeReviews(
       setReviews([]);
       setSummary(null);
       setHasNextPage(false);
-      productId.current = null;
       return;
     }
     setLoading(true);
     setError(null);
     page.current = 1;
     try {
-      // Summary failing must not cost the reviews, so it degrades to null on its own.
-      const [product, summ] = await Promise.all([
-        client.getProduct(handle),
-        client.getProductSummary(handle).catch(() => null),
-      ]);
+      // One widget read returns the summary and the first page of reviews together.
+      const first = await client.getProductReviews(handle, { page: 1, perPage });
       if (reqId.current !== id) return;
-      setSummary(summ);
-      productId.current = product?.id ?? null;
-      if (!product) {
-        setReviews([]);
-        setHasNextPage(false);
-        return;
-      }
-      const first = await client.listProductReviews(product.id, { page: 1, perPage });
-      if (reqId.current !== id) return;
+      setSummary(first.summary);
       setReviews(first.reviews);
       setHasNextPage(first.hasNextPage);
     } catch (caught) {
@@ -84,12 +70,12 @@ export function useJudgeMeReviews(
   }, [client, handle, perPage]);
 
   const loadMore = useCallback(async () => {
-    if (!client || productId.current == null || loading || !hasNextPage) return;
+    if (!client || !handle || loading || !hasNextPage) return;
     const id = ++reqId.current;
     setLoading(true);
     try {
       const next = page.current + 1;
-      const pageData = await client.listProductReviews(productId.current, { page: next, perPage });
+      const pageData = await client.getProductReviews(handle, { page: next, perPage });
       if (reqId.current !== id) return;
       page.current = next;
       setReviews((current) => [...current, ...pageData.reviews]);
@@ -99,7 +85,7 @@ export function useJudgeMeReviews(
     } finally {
       if (reqId.current === id) setLoading(false);
     }
-  }, [client, loading, hasNextPage, perPage]);
+  }, [client, handle, loading, hasNextPage, perPage]);
 
   useEffect(() => {
     void loadFirst();

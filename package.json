@@ -1,29 +1,44 @@
 {
   "name": "@tiledev/sdk-judgeme",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Judge.me product reviews for Tile apps — a framework-agnostic client plus a React hook, so the review logic is written once and reused across apps.",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
-    "./types": { "types": "./dist/types.d.ts", "default": "./dist/types.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "default": "./dist/types.js"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["tile", "judgeme", "reviews", "shopify"],
+  "keywords": [
+    "tile",
+    "judgeme",
+    "reviews",
+    "shopify"
+  ],
   "license": "UNLICENSED",
   "peerDependencies": {
     "react": ">=17",
     "react-native": ">=0.68"
   },
   "peerDependenciesMeta": {
-    "react-native": { "optional": true }
+    "react-native": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/react": "~19.1.10",

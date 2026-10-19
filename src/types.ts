@@ -48,14 +48,15 @@ export interface ReviewPicture {
 
 /** One published review, flattened. */
 export interface JudgeMeReview {
-  id: number;
+  /** Judge.me's review id — a UUID string in the widget feed. */
+  id: string;
   /** Often null — Judge.me reviews frequently have a body and no title. */
   title: string | null;
   body: string;
   /** 1–5. */
   rating: number;
   reviewerName: string;
-  /** True when Judge.me marked it `verified-purchase`. */
+  /** True when Judge.me marked it a verified buyer. */
   verified: boolean;
   /** ISO-8601. */
   createdAt: string;
